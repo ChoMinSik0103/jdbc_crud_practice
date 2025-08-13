@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="insertIncidentHistory">
+        INSERT INTO INCIDENT_HISTORY
+        (INCIDENT_TIMESTAMP,
+         PERPETRATOR_ID, VICTIM_ID,
+         DAMAGE_SCORE, DAMAGE_TYPE_ID)
+        VALUES
+        (?,
+         ?,
+         ?,
+         (SELECT
+             SCORE
+         FROM DAMAGE_TYPE
+         WHERE DAMAGE_TYPE_ID = ?),
+         ?)
+    </entry>
+
+    <entry key="checkInsertIncidentHistory">
+        SELECT A.INCIDENT_SEQ, A.INCIDENT_TIMESTAMP,
+        (SELECT B.NAME FROM MEMBER B WHERE A.PERPETRATOR_ID = B.MEMBER_ID) PERPETRATOR_ID,
+        (SELECT B.NAME FROM MEMBER B WHERE A.VICTIM_ID = B.MEMBER_ID) VICTIM,
+        A.DAMAGE_SCORE,  B.PENALTY
+        FROM INCIDENT_HISTORY A, DAMAGE_TYPE B
+        WHERE A.DAMAGE_TYPE_ID = B.DAMAGE_TYPE_ID
+        AND A.INCIDENT_SEQ = ?
+    </entry>
+
+    <entry key="incidentSelectListDate">
+        SELECT A.INCIDENT_SEQ, A.INCIDENT_TIMESTAMP,
+        (SELECT B.NAME FROM MEMBER B WHERE A.PERPETRATOR_ID = B.MEMBER_ID) PERPETRATOR_ID,
+        (SELECT B.NAME FROM MEMBER B WHERE A.VICTIM_ID = B.MEMBER_ID) VICTIM,
+        A.DAMAGE_SCORE,  B.PENALTY
+        FROM INCIDENT_HISTORY A, DAMAGE_TYPE B
+        WHERE A.DAMAGE_TYPE_ID = B.DAMAGE_TYPE_ID
+        AND A.INCIDENT_TIMESTAMP = ?
+    </entry>
+
+    <entry key="incidentSelectListVictimId">
+        SELECT A.INCIDENT_SEQ, A.INCIDENT_TIMESTAMP,
+        (SELECT B.NAME FROM MEMBER B WHERE A.PERPETRATOR_ID = B.MEMBER_ID) PERPETRATOR_ID,
+        (SELECT B.NAME FROM MEMBER B WHERE A.VICTIM_ID = B.MEMBER_ID) VICTIM,
+        A.DAMAGE_SCORE,  B.PENALTY
+        FROM INCIDENT_HISTORY A, DAMAGE_TYPE B
+        WHERE A.DAMAGE_TYPE_ID = B.DAMAGE_TYPE_ID
+        AND A.PERPETRATOR_ID = ?
+    </entry>
+
+    <entry key="incidentSelectList">
+        SELECT A.INCIDENT_SEQ, A.INCIDENT_TIMESTAMP,
+        (SELECT B.NAME FROM MEMBER B WHERE A.PERPETRATOR_ID = B.MEMBER_ID) PERPETRATOR_ID,
+        (SELECT B.NAME FROM MEMBER B WHERE A.VICTIM_ID = B.MEMBER_ID) VICTIM,
+        A.DAMAGE_SCORE,  B.PENALTY
+        FROM INCIDENT_HISTORY A, DAMAGE_TYPE B
+        WHERE A.DAMAGE_TYPE_ID = B.DAMAGE_TYPE_ID
+    </entry>
+
+    <entry key="selectMemberType">
+        SELECT COUNT(*) CNT
+        FROM DAMAGE_TYPE A, MEMBER B
+        WHERE B.MEMBER_ID = ?
+        AND A.DAMAGE_TYPE_ID = ?
+        AND A.MEMBER_TYPE = B.MEMBER_TYPE
+    </entry>
+
+    <entry key="updateIncident">
+        UPDATE INCIDENT_HISTORY A
+        SET INCIDENT_TIMESTAMP = STR_TO_DATE(?, '%Y%m%d'),
+            PERPETRATOR_ID = ?,
+            VICTIM_ID = ?,
+            DAMAGE_SCORE = (SELECT SCORE FROM DAMAGE_TYPE WHERE DAMAGE_TYPE_ID = ?),
+            DAMAGE_TYPE_ID = ?
+        WHERE INCIDENT_SEQ = ?;
+    </entry>
+
+    <entry key="deleteIncident">
+        DELETE FROM INCIDENT_HISTORY
+        WHERE INCIDENT_SEQ = ?;
+    </entry>
+
+</properties>
